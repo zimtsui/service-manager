@@ -54,8 +54,11 @@ class Service {
         if (ServiceClass) {
             this.__ServiceClass = ServiceClass;
             this.__args = args;
+            this.__registry = null;
             return this;
-        } return this.__registry;
+        }
+        if (this.starting?.isFulfilled()) return this.__registry;
+        throw new Error('cannot get service instance when the service is not running');
     }
 
     __constructService() {
@@ -68,8 +71,8 @@ class Service {
         this.starting ||= Promise
             .resolve(this.__dependencies)
             .map(dependency => this.__manager.services[dependency].start())
-            .then(this.__constructService)
-            .then(::this.__registry.start);
+            .then(::this.__constructService)
+            .then(() => this.__registry.start());
         return this.starting;
     }
 
