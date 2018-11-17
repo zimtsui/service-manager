@@ -65,13 +65,13 @@ manager
     .registry(Service1);
 
 Promise
-    .try(() => manager
+    .try(::(manager
         .service('service2')
-        .start()) // 启动 service2 之前，manager 会自动先递归地启动所有它直接或间接依赖的 service。
+        .start)) // 启动 service2 之前，manager 会自动先递归地启动所有它直接或间接依赖的 service。
     .delay(1000)
-    .then(() => manager
+    .then(::(manager
         .service('service1')
-        .stop()); // 停止 service1 之前，manager 会自动先递归地停止所有直接或间接依赖于它的 service。
+        .stop)); // 停止 service1 之前，manager 会自动先递归地停止所有直接或间接依赖于它的 service。
 ```
 
 除了 functional programming 写法之外，当然你也可以用 imperative programming 的写法：
@@ -88,8 +88,8 @@ Promise
 
 ```js
 Promise
-    .try(() => manager.startAll())
-    .then(() => manager.stopAll());
+    .try(::manager.startAll)
+    .then(::manager.stopAll);
 ```
 
 设置器继承了 manager 的以下方法：
@@ -112,11 +112,11 @@ manager
     .service('service3') // 直接切换到 service3 的设置器。
     .dependencies('service1', 'service2')
     .registry(Service3)
-    
+
     .startAll(); // 直接在设置器上启动所有 service。
 ```
 
-设置器的 registry 方法不带参数时会返回注册的 Service 类的实例。设置器对象会作为上下文传入 Service 类的构造函数。这样就可以实现 service 间互相调用了。
+设置器的 registry 方法不带参数时会返回注册的 Service 类的实例。设置器对象会作为上下文传入 Service 类的构造函数。这样就可以实现 service 间互相调用方法了。
 
 ```js
 class Service1 {
@@ -139,7 +139,7 @@ class Service2 {
             .service('service1') // 切换到 service1 的设置器。
             .registry(); // 获取 service1 的本体。
         console.log(service1 instanceof Service1); // true
-        console.log(service1.somePublicMethed()); // 这样调用另一个 service 就非常方便了。
+        console.log(service1.somePublicMethed()); // 这样调用另一个 service 的方法就非常方便了。
     }
 
     async start() {}
