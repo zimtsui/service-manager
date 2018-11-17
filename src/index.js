@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import Promise from 'bluebird';
 
-class Service {
+class ServiceAccessor {
     constructor(manager, name) {
         Object.assign(this, {
             __manager: manager,
@@ -100,7 +100,7 @@ class ServiceManager extends EventEmitter {
     }
 
     service(serviceName) {
-        this.services[serviceName] ||= new Service(this, serviceName);
+        this.services[serviceName] ||= new ServiceAccessor(this, serviceName);
         return this.services[serviceName];
     }
 
