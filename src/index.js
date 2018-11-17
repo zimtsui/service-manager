@@ -60,7 +60,7 @@ class Service {
     }
 
     __constructService() {
-        this.__registry = new this.__ServiceClass(this, this.__args);
+        this.__registry = new this.__ServiceClass(this, ...this.__args);
     }
 
     start() {
