@@ -30,7 +30,7 @@ class Service {
         return Promise
             .resolve(this.supports)
             .map(support => this.__manager.services[support].stop())
-            .then(() => this.__manager.emit('fatal'));
+            .then(() => this.__manager.emit('fatal', this.name));
     }
 
     dependencies(...dependencies) {
