@@ -23,10 +23,10 @@ class Service {
         this.__manager.emit('error', error);
     }
 
-    fatal(reusable = false) {
+    fatal(reusable = this.__reusable) {
         this.starting = null;
         this.stopping = Promise.resolve();
-        if (!reusable) this.__constructService();
+        if (!reusable) this.__registry = null;
         return Promise
             .resolve(this.supports)
             .map(support => this.__manager.services[support].stop())
@@ -54,13 +54,12 @@ class Service {
         if (ServiceClass) {
             this.__ServiceClass = ServiceClass;
             this.__args = args;
-            this.__constructService();
             return this;
         } return this.__registry;
     }
 
     __constructService() {
-        this.__registry = new this.__ServiceClass(this, ...this.__args);
+        this.__registry ||= new this.__ServiceClass(this, ...this.__args);
     }
 
     start() {
@@ -69,6 +68,7 @@ class Service {
         this.starting ||= Promise
             .resolve(this.__dependencies)
             .map(dependency => this.__manager.services[dependency].start())
+            .then(this.__constructService)
             .then(::this.__registry.start);
         return this.starting;
     }
@@ -81,7 +81,7 @@ class Service {
             .map(support => this.__manager.services[support].stop())
             .then(::this.__registry.stop)
             .then(() => {
-                if (!this.__reusable) this.__constructService();
+                if (!this.__reusable) this.__registry = null;
             });
         return this.stopping;
     }
