@@ -19,8 +19,8 @@ import ServiceManager from 'service-manager';
 const manager = new ServiceManager(); // 创建一个 service-manager。
 
 manager
-    .service('service1') // 定义一个 service，命名为 'service2'。返回一个对 service2 的设置器。
-    .registry(Service1); // 将 Service1 注册到 service1
+    .service('service1') // 定义一个 service，命名为 'service2'。返回一个对 service2 的设置器 (ServiceAccessor)。
+    .registry(Service1); // 将 Service1 注册到 service1。
 
 Promise
     .try(() => manager
@@ -58,7 +58,9 @@ service-manager 用来设置 service 间的依赖关系并自动管理 start 和
 manager
     .service('service2')
     .registry(Service2)
-    .dependencies('service1'); // 添加 service1 到 service2 的依赖中。不加参数返回已添加的依赖数组。
+    .addDependencies('service1') // 添加若干个依赖。
+    .deleteDependencies('service1'); // 删除若干个依赖。
+    .dependencies('service1') // 清空所有依赖并添加若干个依赖。不加参数返回已添加的依赖数组。
 
 manager
     .service('service1')
@@ -74,7 +76,7 @@ Promise
         .stop)); // 停止 service1 之前，manager 会自动先递归地停止所有直接或间接依赖于它的 service。
 ```
 
-除了 functional programming 写法之外，当然你也可以用 imperative programming 的写法：
+你也可以不用函数式编程的写法：
 
 ```js
 (async () => {
@@ -84,7 +86,7 @@ Promise
 })();
 ```
 
-你也可以一次性启动或停止所有 service。
+你还可以一次性启动或停止所有 service。
 
 ```js
 Promise
@@ -98,7 +100,7 @@ Promise
 - startAll
 - stopAll
 
-所以可以进行如下优美操作：
+这样就可以进行如下优美操作：
 
 ```js
 manager
@@ -175,7 +177,7 @@ class Service1 {
     __someMethod() {
         // 参数 reusable 表示以后再次启动时是要重新创建一个 Service 类的实例还是复用之前的实例
         // true 表示复用，默认为设置器上设置的值。
-        this.__context.fatal(true);
+        this.__context.fatal(true); // 返回一个 Promise。
     }
 
     async start() {}
