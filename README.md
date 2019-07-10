@@ -5,8 +5,8 @@ service 是常驻内存的程序。一个 service 表示为一个类，具有如
 ```js
 class Service1 {
     constructor : function(context : ServiceAccessor)
-    start : Promise | async function,
-    stop : Promise | async function,
+    start : async function,
+    stop : async function,
 }
 ```
 
